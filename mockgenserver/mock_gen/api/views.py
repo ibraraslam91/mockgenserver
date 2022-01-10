@@ -2,12 +2,13 @@ import requests
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response, status
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.mixins import DestroyModelMixin
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from mockgenserver.mock_gen.api.serializers import ProjectSerializer, ScreenSerializer
-from mockgenserver.mock_gen.models import Project, Screen, Layer
 from mockgenserver.mock_gen.api.utils import transform_mocks
+from mockgenserver.mock_gen.models import Project, Screen, Layer
 
 
 class ProjectViewSet(NestedViewSetMixin, ModelViewSet):
@@ -16,7 +17,7 @@ class ProjectViewSet(NestedViewSetMixin, ModelViewSet):
     serializer_class = ProjectSerializer
 
     def get_queryset(self):
-        return Project.objects.filter(users__in=[self.request.user])
+        return Project.objects.filter(users__in=[self.request.user]).order_by("id")
 
     def create(self, request, *args, **kwargs):
         request_data = request.data
@@ -25,7 +26,7 @@ class ProjectViewSet(NestedViewSetMixin, ModelViewSet):
 
 
 class ScreenViewSet(NestedViewSetMixin, ModelViewSet):
-    base_url = "https://8f82-35-196-217-243.ngrok.io"
+    base_url = "https://8485-34-83-160-109.ngrok.io"
     url = f"{base_url}/mock_gen"
 
     queryset = Screen.objects.all()
@@ -49,11 +50,12 @@ class ScreenViewSet(NestedViewSetMixin, ModelViewSet):
         transformed_mocks = transform_mocks(mocks)
         if transformed_mocks:
             Layer.objects.create(screen_id=pk, mock=transformed_mocks)
-        print("#"*40)
+        print("#" * 40)
         print(transformed_mocks)
         print("#" * 40)
         return Response(data=transformed_mocks, status=status.HTTP_200_OK)
 
 
-#[{'score': 0.9840945601463318, 'element': 'textarea', 'bbox': [667, 145, 245, 99]},
-# {'score': 0.8314349055290222, 'element': 'image', 'bbox': [681, 280, 104, 81]}]
+class LayerViewSet(DestroyModelMixin, GenericViewSet):
+
+    queryset = Layer.objects.all()

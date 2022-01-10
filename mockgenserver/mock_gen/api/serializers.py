@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from mockgenserver.mock_gen.models import Project, Screen, Layer
-from mockgenserver.users.models import User
 from mockgenserver.users.api.serializers import UserSerializer
+from mockgenserver.users.models import User
 
 
 class LayerSerializer(serializers.ModelSerializer):
@@ -25,15 +25,19 @@ class ScreenSerializer(serializers.ModelSerializer):
 class ScreenListSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     id = serializers.IntegerField()
+    layers_count = serializers.SerializerMethodField()
+
+    def get_layers_count(self, obj):
+        return obj.layers.count()
 
     class Meta:
         model = Screen
-        fields = ["id", "name"]
+        fields = ["id", "name", "layers_count"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    added_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    users = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
+    added_by = serializers.PrimaryKeyRelatedField(read_only=True)
+    users = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
     screens = ScreenListSerializer(many=True, read_only=True)
 
     class Meta:
