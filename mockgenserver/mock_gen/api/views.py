@@ -26,7 +26,7 @@ class ProjectViewSet(NestedViewSetMixin, ModelViewSet):
 
 
 class ScreenViewSet(NestedViewSetMixin, ModelViewSet):
-    base_url = "https://8485-34-83-160-109.ngrok.io"
+    base_url = "https://603a-34-83-210-44.ngrok.io"
     url = f"{base_url}/mock_gen"
 
     queryset = Screen.objects.all()

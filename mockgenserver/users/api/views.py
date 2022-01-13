@@ -6,8 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import Group
 
-from mockgenserver.users.api.serializers import LoginRequestSerializer, UserSerializer
+from mockgenserver.users.api.serializers import LoginRequestSerializer, UserSerializer, GroupSerializer
 
 User = get_user_model()
 
@@ -24,6 +25,12 @@ class UserViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, GenericVi
         company = self.request.user.company_id
         request_data["company"] = company
         return super().create(request)
+
+class GroupViewSet(ListModelMixin, GenericViewSet):
+    serializer_class = GroupSerializer
+
+    def get_queryset(self):
+        return Group.objects.all()
 
 
 class LoginAPIView(APIView):

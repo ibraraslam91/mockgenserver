@@ -1,6 +1,7 @@
 """
 Base settings to build other settings files upon.
 """
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -298,4 +299,6 @@ CORS_ALLOWED_ORIGINS = [
 # Your stuff...
 # ------------------------------------------------------------------------------
 
-ACCESS_TOKEN_LIFETIME = 60 * 60
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+}
